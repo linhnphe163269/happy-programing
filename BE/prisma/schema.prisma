@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,185 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model account {
+  id          Int     @id @default(autoincrement())
+  accountname String  @db.VarChar(50)
+  password    String  @db.VarChar(50)
+  roleid      Int?
+  email       String? @db.VarChar(250)
+
+  @@index([roleid], map: "roleid")
+}
+
+model answer {
+  id                  Int     @id @default(autoincrement())
+  mentorcoderequestid Int?
+  content             String? @db.VarChar(250)
+
+  @@index([mentorcoderequestid], map: "mentorcoderequestid")
+}
+
+model coderequest {
+  id       Int       @id @default(autoincrement())
+  title    String?   @db.VarChar(250)
+  content  String?   @db.VarChar(250)
+  deadline DateTime? @db.Date
+  menteeID Int?
+
+  @@index([menteeID], map: "menteeID")
+}
+
+model coderequestskill {
+  id            Int  @id @default(autoincrement())
+  coderequestid Int?
+  skillid       Int?
+
+  @@index([coderequestid], map: "coderequestid")
+  @@index([skillid], map: "skillid")
+}
+
+model feedback {
+  id       Int     @id @default(autoincrement())
+  menteeid Int?
+  star     Int?
+  comment  String? @db.VarChar(250)
+
+  @@index([menteeid], map: "menteeid")
+}
+
+model feedbackanswer {
+  id         Int  @id @default(autoincrement())
+  feedbackid Int?
+  answerid   Int?
+
+  @@index([answerid], map: "answerid")
+  @@index([feedbackid], map: "feedbackid")
+}
+
+model hirerelatitonship {
+  id       Int  @id @default(autoincrement())
+  menteeid Int?
+  mentorid Int?
+
+  @@index([menteeid], map: "menteeid")
+  @@index([mentorid], map: "mentorid")
+}
+
+model hirerequest {
+  id       Int     @id @default(autoincrement())
+  menteeid Int?
+  mentorid Int?
+  title    String? @db.VarChar(250)
+  content  String? @db.VarChar(250)
+  statusid Int?
+
+  @@index([menteeid], map: "menteeid")
+  @@index([mentorid], map: "mentorid")
+  @@index([statusid], map: "statusid")
+}
+
+model historyhirerelationship {
+  id        Int       @id @default(autoincrement())
+  menteeid  Int?
+  mentorid  Int?
+  closedate DateTime? @db.Date
+
+  @@index([menteeid], map: "menteeid")
+  @@index([mentorid], map: "mentorid")
+}
+
+model image {
+  id        Int     @id @default(autoincrement())
+  accountid Int?
+  image     String? @db.VarChar(250)
+
+  @@index([accountid], map: "accountid")
+}
+
+model job {
+  id      Int     @id @default(autoincrement())
+  jobname String? @db.VarChar(250)
+}
+
+model mentee {
+  id        Int       @id @default(autoincrement())
+  accountid Int?
+  name      String    @db.VarChar(250)
+  address   String?   @db.VarChar(250)
+  phone     String?   @db.VarChar(250)
+  birthday  DateTime? @db.Date
+  sex       String?   @db.VarChar(250)
+  avatar    String?   @db.VarChar(250)
+  introduce String?   @db.VarChar(250)
+
+  @@index([accountid], map: "accountid")
+}
+
+model mentor {
+  id          Int       @id @default(autoincrement())
+  accountid   Int?
+  name        String?   @db.VarChar(250)
+  address     String?   @db.VarChar(250)
+  phone       String?   @db.VarChar(250)
+  birthday    DateTime? @db.Date
+  sex         String?   @db.VarChar(250)
+  introduce   String?   @db.VarChar(250)
+  achievement String?   @db.VarChar(250)
+  avatar      String?   @db.VarChar(250)
+  costHire    Float     @db.Float
+
+  @@index([accountid], map: "accountid")
+}
+
+model mentorcoderequest {
+  id            Int  @id @default(autoincrement())
+  coderequestid Int?
+  mentorid      Int?
+
+  @@index([coderequestid], map: "coderequestid")
+  @@index([mentorid], map: "mentorid")
+}
+
+model mentorcoderequeststatus {
+  id                  Int  @id @default(autoincrement())
+  mentorcoderequestid Int?
+  statusid            Int?
+
+  @@index([mentorcoderequestid], map: "mentorcoderequestid")
+  @@index([statusid], map: "statusid")
+}
+
+model mentorjob {
+  id       Int  @id @default(autoincrement())
+  mentorid Int?
+  jobid    Int?
+
+  @@index([jobid], map: "jobid")
+  @@index([mentorid], map: "mentorid")
+}
+
+model mentorskill {
+  id       Int  @id @default(autoincrement())
+  mentorid Int?
+  skillid  Int?
+
+  @@index([mentorid], map: "mentorid")
+  @@index([skillid], map: "skillid")
+}
+
+model roles {
+  id   Int     @id @default(autoincrement())
+  name String? @db.VarChar(50)
+}
+
+model skill {
+  id   Int     @id @default(autoincrement())
+  name String? @db.VarChar(250)
+}
+
+model status {
+  id     Int     @id @default(autoincrement())
+  Status String? @db.VarChar(50)
 }
