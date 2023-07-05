@@ -8,64 +8,82 @@ datasource db {
 }
 
 model account {
-  id          Int     @id @default(autoincrement())
-  accountname String  @db.VarChar(50)
-  password    String  @db.VarChar(50)
+  id          Int      @id @default(autoincrement())
+  accountname String   @db.VarChar(50)
+  password    String   @db.VarChar(50)
   roleid      Int?
-  email       String? @db.VarChar(250)
+  email       String?  @db.VarChar(250)
+  roles       roles?   @relation(fields: [roleid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "account_ibfk_1")
+  image       image[]
+  mentee      mentee[]
+  mentor      mentor[]
 
   @@index([roleid], map: "roleid")
 }
 
 model answer {
-  id                  Int     @id @default(autoincrement())
+  id                  Int                @id @default(autoincrement())
   mentorcoderequestid Int?
-  content             String? @db.VarChar(250)
+  content             String?            @db.VarChar(250)
+  mentorcoderequest   mentorcoderequest? @relation(fields: [mentorcoderequestid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "answer_ibfk_1")
+  feedbackanswer      feedbackanswer[]
 
   @@index([mentorcoderequestid], map: "mentorcoderequestid")
 }
 
 model coderequest {
-  id       Int       @id @default(autoincrement())
-  title    String?   @db.VarChar(250)
-  content  String?   @db.VarChar(250)
-  deadline DateTime? @db.Date
-  menteeID Int?
+  id                Int                 @id @default(autoincrement())
+  title             String?             @db.VarChar(250)
+  content           String?             @db.VarChar(250)
+  deadline          DateTime?           @db.Date
+  menteeID          Int?
+  mentee            mentee?             @relation(fields: [menteeID], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "coderequest_ibfk_1")
+  coderequestskill  coderequestskill[]
+  mentorcoderequest mentorcoderequest[]
 
   @@index([menteeID], map: "menteeID")
 }
 
 model coderequestskill {
-  id            Int  @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   coderequestid Int?
   skillid       Int?
+  coderequest   coderequest? @relation(fields: [coderequestid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "coderequestskill_ibfk_1")
+  skill         skill?       @relation(fields: [skillid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "coderequestskill_ibfk_2")
 
   @@index([coderequestid], map: "coderequestid")
   @@index([skillid], map: "skillid")
 }
 
 model feedback {
-  id       Int     @id @default(autoincrement())
-  menteeid Int?
-  star     Int?
-  comment  String? @db.VarChar(250)
+  id             Int              @id @default(autoincrement())
+  menteeid       Int?
+  star           Int?
+  comment        String?          @db.VarChar(250)
+  mentorid       Int
+  mentee         mentee?          @relation(fields: [menteeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "feedback_ibfk_1")
+  feedbackanswer feedbackanswer[]
 
   @@index([menteeid], map: "menteeid")
 }
 
 model feedbackanswer {
-  id         Int  @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   feedbackid Int?
   answerid   Int?
+  feedback   feedback? @relation(fields: [feedbackid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "feedbackanswer_ibfk_1")
+  answer     answer?   @relation(fields: [answerid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "feedbackanswer_ibfk_2")
 
   @@index([answerid], map: "answerid")
   @@index([feedbackid], map: "feedbackid")
 }
 
 model hirerelatitonship {
-  id       Int  @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   menteeid Int?
   mentorid Int?
+  mentee   mentee? @relation(fields: [menteeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hirerelatitonship_ibfk_1")
+  mentor   mentor? @relation(fields: [mentorid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hirerelatitonship_ibfk_2")
 
   @@index([menteeid], map: "menteeid")
   @@index([mentorid], map: "mentorid")
@@ -78,6 +96,9 @@ model hirerequest {
   title    String? @db.VarChar(250)
   content  String? @db.VarChar(250)
   statusid Int?
+  mentee   mentee? @relation(fields: [menteeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hirerequest_ibfk_1")
+  mentor   mentor? @relation(fields: [mentorid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hirerequest_ibfk_2")
+  status   status? @relation(fields: [statusid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hirerequest_ibfk_3")
 
   @@index([menteeid], map: "menteeid")
   @@index([mentorid], map: "mentorid")
@@ -89,101 +110,133 @@ model historyhirerelationship {
   menteeid  Int?
   mentorid  Int?
   closedate DateTime? @db.Date
+  mentee    mentee?   @relation(fields: [menteeid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "historyhirerelationship_ibfk_1")
+  mentor    mentor?   @relation(fields: [mentorid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "historyhirerelationship_ibfk_2")
 
   @@index([menteeid], map: "menteeid")
   @@index([mentorid], map: "mentorid")
 }
 
 model image {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   accountid Int?
-  image     String? @db.VarChar(250)
+  image     String?  @db.VarChar(250)
+  account   account? @relation(fields: [accountid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "image_ibfk_1")
 
   @@index([accountid], map: "accountid")
 }
 
 model job {
-  id      Int     @id @default(autoincrement())
-  jobname String? @db.VarChar(250)
+  id        Int         @id @default(autoincrement())
+  jobname   String?     @db.VarChar(250)
+  mentorjob mentorjob[]
 }
 
 model mentee {
-  id        Int       @id @default(autoincrement())
-  accountid Int?
-  name      String    @db.VarChar(250)
-  address   String?   @db.VarChar(250)
-  phone     String?   @db.VarChar(250)
-  birthday  DateTime? @db.Date
-  sex       String?   @db.VarChar(250)
-  avatar    String?   @db.VarChar(250)
-  introduce String?   @db.VarChar(250)
+  id                      Int                       @id @default(autoincrement())
+  accountid               Int?
+  name                    String                    @db.VarChar(250)
+  address                 String?                   @db.VarChar(250)
+  phone                   String?                   @db.VarChar(250)
+  birthday                DateTime?                 @db.Date
+  sex                     String?                   @db.VarChar(250)
+  avatar                  String?                   @db.VarChar(250)
+  introduce               String?                   @db.VarChar(250)
+  coderequest             coderequest[]
+  feedback                feedback[]
+  hirerelatitonship       hirerelatitonship[]
+  hirerequest             hirerequest[]
+  historyhirerelationship historyhirerelationship[]
+  account                 account?                  @relation(fields: [accountid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentee_ibfk_1")
 
   @@index([accountid], map: "accountid")
 }
 
 model mentor {
-  id          Int       @id @default(autoincrement())
-  accountid   Int?
-  name        String?   @db.VarChar(250)
-  address     String?   @db.VarChar(250)
-  phone       String?   @db.VarChar(250)
-  birthday    DateTime? @db.Date
-  sex         String?   @db.VarChar(250)
-  introduce   String?   @db.VarChar(250)
-  achievement String?   @db.VarChar(250)
-  avatar      String?   @db.VarChar(250)
-  costHire    Float     @db.Float
+  id                      Int                       @id @default(autoincrement())
+  accountid               Int?
+  name                    String?                   @db.VarChar(250)
+  address                 String?                   @db.VarChar(250)
+  phone                   String?                   @db.VarChar(250)
+  birthday                DateTime?                 @db.Date
+  sex                     String?                   @db.VarChar(250)
+  introduce               String?                   @db.VarChar(250)
+  achievement             String?                   @db.VarChar(250)
+  avatar                  String?                   @db.VarChar(250)
+  costHire                Float                     @db.Float
+  hirerelatitonship       hirerelatitonship[]
+  hirerequest             hirerequest[]
+  historyhirerelationship historyhirerelationship[]
+  account                 account?                  @relation(fields: [accountid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentor_ibfk_1")
+  mentorcoderequest       mentorcoderequest[]
+  mentorjob               mentorjob[]
+  mentorskill             mentorskill[]
 
   @@index([accountid], map: "accountid")
 }
 
 model mentorcoderequest {
-  id            Int  @id @default(autoincrement())
-  coderequestid Int?
-  mentorid      Int?
+  id                      Int                       @id @default(autoincrement())
+  coderequestid           Int?
+  mentorid                Int?
+  answer                  answer[]
+  coderequest             coderequest?              @relation(fields: [coderequestid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentorcoderequest_ibfk_1")
+  mentor                  mentor?                   @relation(fields: [mentorid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentorcoderequest_ibfk_2")
+  mentorcoderequeststatus mentorcoderequeststatus[]
 
   @@index([coderequestid], map: "coderequestid")
   @@index([mentorid], map: "mentorid")
 }
 
 model mentorcoderequeststatus {
-  id                  Int  @id @default(autoincrement())
+  id                  Int                @id @default(autoincrement())
   mentorcoderequestid Int?
   statusid            Int?
+  mentorcoderequest   mentorcoderequest? @relation(fields: [mentorcoderequestid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentorcoderequeststatus_ibfk_1")
+  status              status?            @relation(fields: [statusid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentorcoderequeststatus_ibfk_2")
 
   @@index([mentorcoderequestid], map: "mentorcoderequestid")
   @@index([statusid], map: "statusid")
 }
 
 model mentorjob {
-  id       Int  @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   mentorid Int?
   jobid    Int?
+  mentor   mentor? @relation(fields: [mentorid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentorjob_ibfk_1")
+  job      job?    @relation(fields: [jobid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentorjob_ibfk_2")
 
   @@index([jobid], map: "jobid")
   @@index([mentorid], map: "mentorid")
 }
 
 model mentorskill {
-  id       Int  @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   mentorid Int?
   skillid  Int?
+  mentor   mentor? @relation(fields: [mentorid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentorskill_ibfk_1")
+  skill    skill?  @relation(fields: [skillid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mentorskill_ibfk_2")
 
   @@index([mentorid], map: "mentorid")
   @@index([skillid], map: "skillid")
 }
 
 model roles {
-  id   Int     @id @default(autoincrement())
-  name String? @db.VarChar(50)
+  id      Int       @id @default(autoincrement())
+  name    String?   @db.VarChar(50)
+  account account[]
 }
 
 model skill {
-  id   Int     @id @default(autoincrement())
-  name String? @db.VarChar(250)
+  id               Int                @id @default(autoincrement())
+  name             String?            @db.VarChar(250)
+  coderequestskill coderequestskill[]
+  mentorskill      mentorskill[]
 }
 
 model status {
-  id     Int     @id @default(autoincrement())
-  Status String? @db.VarChar(50)
+  id                      Int                       @id @default(autoincrement())
+  Status                  String?                   @db.VarChar(50)
+  hirerequest             hirerequest[]
+  mentorcoderequeststatus mentorcoderequeststatus[]
 }
