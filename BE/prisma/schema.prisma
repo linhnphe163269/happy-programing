@@ -188,6 +188,7 @@ model Skill {
   CodeRequestSkill CodeRequestSkill[]
   MentorSkill      MentorSkill[]
 
+  //  @@index([name], map: "name")
   @@map("skill")
 }
 
@@ -196,7 +197,8 @@ model MentorSkill {
   skillId  Int    @map("skill_id")
   Skill    Skill  @relation(fields: [skillId], references: [id])
   Mentor   Mentor @relation(fields: [mentorId], references: [id])
-//...
+
+  //...
   @@id([mentorId, skillId])
   @@map("mentor_skill")
 }
