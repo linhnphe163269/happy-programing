@@ -5,5 +5,6 @@
 
 */
 -- AlterTable
-ALTER TABLE `skill` DROP COLUMN `status`,
-    ADD COLUMN `active` BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE `skill`
+DROP COLUMN `status`,
+ADD COLUMN `active` BOOLEAN NOT NULL DEFAULT true;

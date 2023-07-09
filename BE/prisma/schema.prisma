@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum Role {
   ADMIN
   MENTEE
@@ -22,37 +21,36 @@ enum RequestStatus {
 }
 
 model User {
-  id                Int           @id @default(autoincrement())
-  username          String        @unique @map("username") @db.VarChar(50)
-  password          String        @db.VarChar(250)
-  email             String?       @db.VarChar(250)
-  name              String?       @db.VarChar(250)
-  address           String?       @db.VarChar(250)
-  phone             String?       @db.VarChar(250)
-  birthday          DateTime?     @db.Date
-  sex               String?       @db.VarChar(250)
-  introduce         String?       @db.VarChar(250)
-  avatar            String?       @db.VarChar(250)
-  role              Role
-  Image             Image[]
-  MentorSkill       MentorSkill[]
-  MenteeCodeRequest CodeRequest[] @relation("from")
-  MentorCodeRequest CodeRequest[] @relation("to")
+  id        Int       @id @default(autoincrement())
+  username  String    @unique @map("username") @db.VarChar(50)
+  password  String    @db.VarChar(250)
+  email     String?   @db.VarChar(250)
+  name      String?   @db.VarChar(250)
+  address   String?   @db.VarChar(250)
+  phone     String?   @db.VarChar(250)
+  birthday  DateTime? @db.Date
+  sex       String?   @db.VarChar(250)
+  introduce String?   @db.VarChar(250)
+  avatar    String?   @db.VarChar(250)
+  role      Role
+  Image     Image[]
+  Mentee    Mentee?
+  Mentor    Mentor?
 
   @@map("user")
 }
 
 model CodeRequest {
-  id               Int                @id @default(autoincrement())
-  title            String?            @db.VarChar(250)
-  content          String?            @db.VarChar(250)
-  deadline         DateTime?          @db.Date
-  menteeId         Int                @map("mentee_id")
-  mentorId         Int                @map("mentor_id")
-  status           RequestStatus      @default(OPEN)
-  Mentee           User               @relation("from", fields: [menteeId], references: [id])
-  Mentor           User               @relation("to", fields: [mentorId], references: [id])
+  id       Int           @id @default(autoincrement())
+  title    String?       @db.VarChar(250)
+  content  String?       @db.VarChar(250)
+  deadline DateTime?     @db.Date
+  menteeId Int           @map("mentee_id")
+  status   RequestStatus @default(OPEN)
+  Mentee   Mentee        @relation(fields: [menteeId], references: [id])
+
   CodeRequestSkill CodeRequestSkill[]
+  HireRequest      HireRequest[]
 
   @@map("code_request")
 }
@@ -93,28 +91,17 @@ model CodeRequestSkill {
 //   @@map("feedback_answer")
 // }
 
-// model HireRelatitonship {
-//   mentee   Mentee @relation(fields: [menteeId], references: [id])
-//   menteeId Int    @map("mentee_id")
-//   mentor   Mentor @relation(fields: [mentorId], references: [id])
-//   mentorId Int    @map("mentor_id")
+model HireRequest {
+  id            Int         @id @default(autoincrement())
+  codeRequestId Int         @map("code_request_id")
+  mentorId      Int         @map("mentor_id")
+  title         String?     @db.VarChar(250)
+  content       String?     @db.VarChar(250)
+  Mentor        Mentor      @relation(fields: [mentorId], references: [id])
+  CodeRequest   CodeRequest @relation(fields: [codeRequestId], references: [id])
 
-//   @@id([menteeId, mentorId])
-//   @@map("hire_relationship")
-// }
-
-// model HireRequest {
-//   mentee   Mentee        @relation(fields: [menteeId], references: [id])
-//   menteeId Int           @map("mentee_id")
-//   mentor   Mentor        @relation(fields: [mentorId], references: [id])
-//   mentorId Int           @map("mentor_id")
-//   title    String?       @db.VarChar(250)
-//   content  String?       @db.VarChar(250)
-//   status   RequestStatus
-
-//   @@id([menteeId, mentorId])
-//   @@map("hire_request")
-// }
+  @@map("hire_request")
+}
 
 // model HistoryHireRelationship {
 //   mentee    Mentee    @relation(fields: [menteeId], references: [id])
@@ -136,36 +123,27 @@ model Image {
   @@map("image")
 }
 
-// model Mentee {
-//   id     Int  @id @default(autoincrement())
-//   user   User @relation(fields: [userId], references: [id])
-//   userId Int  @unique @map("user_id")
+model Mentee {
+  id          Int           @id @default(autoincrement())
+  userId      Int           @unique @map("user_id")
+  User        User          @relation(fields: [userId], references: [id])
+  CodeRequest CodeRequest[]
 
-//   Feedback                Feedback[]
-//   HireRelatitonship       HireRelatitonship[]
-//   HireRequest             HireRequest[]
-//   HistoryHireRelationship HistoryHireRelationship[]
-//   CodeRequest             CodeRequest[]
+  @@map("mentee")
+}
 
-//   @@map("mentee")
-// }
+model Mentor {
+  id          Int     @id @default(autoincrement())
+  userId      Int     @unique @map("user_id")
+  achievement String? @db.VarChar(250)
+  costHire    Float?  @map("cost_hire") @db.Float
+  User        User    @relation(fields: [userId], references: [id])
 
-// model Mentor {
-//   id          Int     @id @default(autoincrement())
-//   user        User    @relation(fields: [userId], references: [id])
-//   userId      Int     @unique @map("user_id")
-//   achievement String? @db.VarChar(250)
-//   costHire    Float   @map("cost_hire") @db.Float
+  MentorSkill MentorSkill[]
+  HireRequest HireRequest[]
 
-//   HireRelatitonship       HireRelatitonship[]
-//   HireRequest             HireRequest[]
-//   HistoryHireRelationship HistoryHireRelationship[]
-//   MentorJob               MentorJob[]
-//   MentorSkill             MentorSkill[]
-//   CodeRequest             CodeRequest[]
-
-//   @@map("mentor")
-// }
+  @@map("mentor")
+}
 
 // model mentorCodeRequest {
 //   id            Int @id @default(autoincrement())
@@ -214,12 +192,11 @@ model Skill {
 }
 
 model MentorSkill {
-  mentorId Int   @map("mentor_id")
-  skillId  Int   @map("skill_id")
-  Mentor   User  @relation(fields: [mentorId], references: [id])
-  Skill    Skill @relation(fields: [skillId], references: [id])
+  mentorId Int    @map("mentor_id")
+  skillId  Int    @map("skill_id")
+  Skill    Skill  @relation(fields: [skillId], references: [id])
+  Mentor   Mentor @relation(fields: [mentorId], references: [id])
 
   @@id([mentorId, skillId])
   @@map("mentor_skill")
-
 }

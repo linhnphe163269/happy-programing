@@ -10,6 +10,8 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Prisma } from '@prisma/client';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,5 +32,17 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  async changePassword(
+    @Request() req,
+    @Body() changePasswordDTO: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(
+      req.user as JwtPayloadDto,
+      changePasswordDTO,
+    );
   }
 }

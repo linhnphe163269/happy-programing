@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -9,13 +9,30 @@ export class UsersService {
 
   async create(createUserDto: Prisma.UserCreateInput) {
     const hashedPassword = await argon2.hash(createUserDto.password);
-    const newUser = await this.prisma.user.create({
-      data: {
-        ...createUserDto,
-        password: hashedPassword,
-      },
+
+    const user = await this.prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          ...createUserDto,
+          password: hashedPassword,
+        },
+      });
+
+      const userRole = newUser.role.toLowerCase();
+      await tx[userRole].create({
+        data: {
+          User: {
+            connect: {
+              id: newUser.id,
+            },
+          },
+        },
+      });
+
+      return newUser;
     });
-    return newUser;
+
+    return user;
   }
 
   async findAll() {

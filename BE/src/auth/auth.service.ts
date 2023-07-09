@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import * as argon2 from 'argon2';
 import { Prisma, User } from '@prisma/client';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,10 +35,23 @@ export class AuthService {
     };
   }
 
-  async login(user: any) {
+  async login(user: User) {
     const token = this.getAccessToken(user);
     return {
       access_token: token,
     };
+  }
+
+  async changePassword(
+    user: JwtPayloadDto,
+    changePasswordDTO: ChangePasswordDto,
+  ) {
+    const { oldPass, newPass } = changePasswordDTO;
+    if (this.validateUser(user.username, oldPass)) {
+      const updatedPasswordUser = await this.usersService.update(user.userId, {
+        password: newPass,
+      });
+      return 'Change password successfully!';
+    }
   }
 }

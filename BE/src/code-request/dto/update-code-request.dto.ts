@@ -1,4 +1,5 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateCodeRequestDto } from './create-code-request.dto';
+import { Prisma } from '@prisma/client';
 
-export class UpdateCodeRequestDto extends PartialType(CreateCodeRequestDto) {}
+export type UpdateCodeRequestDto = Prisma.CodeRequestUpdateInput & {
+  skills?: number[];
+};
