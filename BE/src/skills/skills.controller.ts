@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
   UseGuards,
@@ -38,7 +38,7 @@ export class SkillsController {
 
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto) {
     return this.skillsService.update(+id, updateSkillDto);
   }
