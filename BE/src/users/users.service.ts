@@ -19,15 +19,18 @@ export class UsersService {
       });
 
       const userRole = newUser.role.toLowerCase();
-      await tx[userRole].create({
-        data: {
-          User: {
-            connect: {
-              id: newUser.id,
+
+      if (userRole !== 'admin') {
+        await tx[userRole].create({
+          data: {
+            User: {
+              connect: {
+                id: newUser.id,
+              },
             },
           },
-        },
-      });
+        });
+      }
 
       return newUser;
     });

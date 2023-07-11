@@ -16,13 +16,17 @@ export class CodeRequestService {
   ) {
     const { skills, ...payload } = createCodeRequestDto;
 
-    const skillIds = skills.map((skillId: number) => ({
-      Skill: {
-        connect: {
-          id: skillId,
+    let skillIds = [];
+
+    if (skills) {
+      skillIds = skills.map((skillId: number) => ({
+        Skill: {
+          connect: {
+            id: skillId,
+          },
         },
-      },
-    }));
+      }));
+    }
 
     const newCodeRequest = await this.prisma.codeRequest.create({
       data: {
@@ -53,7 +57,7 @@ export class CodeRequestService {
           },
           Mentor: {
             connect: {
-              userId: mentorId,
+              id: mentorId,
             },
           },
         },
@@ -92,10 +96,7 @@ export class CodeRequestService {
     return follows;
   }
 
-  async follow(user: JwtPayloadDto, followDto) {
-    
-
-  }
+  async follow(user: JwtPayloadDto, followDto) {}
 
   async findMyRequest(user: JwtPayloadDto) {
     const myRequests = this.prisma.codeRequest.findMany({
@@ -138,13 +139,13 @@ export class CodeRequestService {
 
   async update(id: number, updateCodeRequestDto: UpdateCodeRequestDto) {
     const { skills, ...payload } = updateCodeRequestDto;
-    const skillIds = skills.map((skillId: number) => ({
-      Skill: {
-        connect: {
-          id: skillId,
-        },
-      },
-    }));
+    // const skillIds = skills.map((skillId: number) => ({
+    //   Skill: {
+    //     connect: {
+    //       id: skillId,
+    //     },
+    //   },
+    // }));
 
     const updateCodeRequest = await this.prisma.codeRequest.update({
       data: {

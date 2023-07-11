@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Put,
+  Patch,
   Param,
   Delete,
   Request,
@@ -32,7 +32,7 @@ export class MenteesController {
     return this.menteesService.findOne(+id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   update(@Request() req, @Body() updateMenteeDto: UpdateMenteeDto) {
     return this.menteesService.update(
       req.user as JwtPayloadDto,

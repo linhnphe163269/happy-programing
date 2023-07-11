@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Put,
+  Patch,
   Param,
   Delete,
   UseGuards,
@@ -35,7 +35,7 @@ export class CodeRequestController {
 
   @Roles(Role.MENTEE)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('inviting')
+  @Post('invite')
   invite(@Request() req, @Body() createHireRequestDto: CreateHireRequestDto) {
     return this.codeRequestService.invite(
       req.user as JwtPayloadDto,
@@ -45,21 +45,21 @@ export class CodeRequestController {
 
   @Roles(Role.MENTEE)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get('inviting')
+  @Get('invite')
   getInvite(@Request() req) {
     return this.codeRequestService.getInvite(req.user);
   }
 
   @Roles(Role.MENTOR)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('following')
+  @Post('follow')
   follow(@Request() req, @Body() followDto) {
     return this.codeRequestService.follow(req.user, followDto);
   }
 
   @Roles(Role.MENTOR)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get('following')
+  @Get('follow')
   getFollow(@Request() req) {
     return this.codeRequestService.getFollow(req.user);
   }
@@ -83,7 +83,7 @@ export class CodeRequestController {
     return this.codeRequestService.findOne(+id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateCodeRequestDto: UpdateCodeRequestDto,
